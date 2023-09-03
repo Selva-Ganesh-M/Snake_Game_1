@@ -2,6 +2,8 @@ package com.snake;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +19,7 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener {
 	static final int SCREEN_WIDTH_X = 600; 
 	static final int SCREEN_HEIGHT_Y = 600;
 	static final int SIZE = 30;
-	static final int DELAY = 100;
+	static final int DELAY = 150;
 	
 	final int[] x = new int[SCREEN_HEIGHT_Y*SCREEN_WIDTH_X];
 	final int[] y = new int[SCREEN_HEIGHT_Y*SCREEN_WIDTH_X];
@@ -42,6 +44,8 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener {
 	
 	public void startGame() {
 		createFood();
+		x[0] = SnakeGame.SCREEN_WIDTH_X/2;
+		y[0] = SnakeGame.SCREEN_HEIGHT_Y/2;
 		this.running  = true;
 		this.timer = new Timer(SnakeGame.DELAY, this);
 		this.timer.start();
@@ -55,23 +59,38 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener {
 	
 	public void draw(Graphics g) {
 		
+		if (this.running) {
 //		draw grid lines
-		for (int i=0; i<SnakeGame.SCREEN_WIDTH_X; i++) {
-			g.drawLine(i*SnakeGame.SIZE, 0, i*SnakeGame.SIZE, SnakeGame.SCREEN_HEIGHT_Y);			
-		}
-		for (int i=0; i<SnakeGame.SCREEN_HEIGHT_Y; i++) {
-			g.drawLine(0, i*SnakeGame.SIZE, SnakeGame.SCREEN_WIDTH_X, i*SnakeGame.SIZE);			
-		}
+//		for (int i=0; i<SnakeGame.SCREEN_WIDTH_X; i++) {
+//			g.drawLine(i*SnakeGame.SIZE, 0, i*SnakeGame.SIZE, SnakeGame.SCREEN_HEIGHT_Y);			
+//		}
+//		for (int i=0; i<SnakeGame.SCREEN_HEIGHT_Y; i++) {
+//			g.drawLine(0, i*SnakeGame.SIZE, SnakeGame.SCREEN_WIDTH_X, i*SnakeGame.SIZE);			
+//		}
 		
 //		draw food
-		g.setColor(Color.yellow);
+		g.setColor(Color.red);
 		g.fillOval(foodX, foodY, SIZE, SIZE);
 		
 //		draw snake
-		for (int i=0; i<bodyPart; i++) {
-			g.setColor(Color.red);
-			g.fillRect(x[i], y[i], SIZE, SIZE);
+		for (int i=0; i<bodyPart; i++) {			
+			g.setColor(Color.orange);
+			if (i==0) {
+				g.setColor(Color.red);
+			}
+			g.fillRect(x[i], y[i], SIZE-2, SIZE-2);
 		}
+		}else {
+			this.gameOver(g);
+		}
+	}
+	
+	public void gameOver(Graphics g) {
+		g.setColor(Color.red);
+		g.setFont(new Font("Serif", Font.BOLD, 75));
+		FontMetrics met = getFontMetrics(g.getFont());
+		g.drawString("Game Over", SnakeGame.SCREEN_HEIGHT_Y/5, SnakeGame.SCREEN_HEIGHT_Y/2);
+		g.drawString("Score: " + this.score, SnakeGame.SCREEN_HEIGHT_Y/5, SnakeGame.SCREEN_HEIGHT_Y/3);
 	}
 	
 	public void move() {
@@ -86,7 +105,14 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener {
 	public void createFood() {
 		random = new Random();
 		foodX = random.nextInt(((int)SCREEN_WIDTH_X/SIZE))*SIZE;
-		foodY = random.nextInt(((int)SCREEN_HEIGHT_Y/SIZE))*SIZE;		
+		foodY = random.nextInt(((int)SCREEN_HEIGHT_Y/SIZE))*SIZE;
+		
+//		to make sure food is not created on snake
+		for (int i=0; i<this.bodyPart; i++) {
+			if (x[i]==foodX && y[i]==foodY) {
+				this.createFood();
+			}
+		}
 	}
 	
 	public void checkFood() {
@@ -109,12 +135,16 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener {
 //		checking if snake hit the wall
 		if (x[0]<0) {
 			this.running = false;
-		}else if (x[0]>SnakeGame.SCREEN_WIDTH_X){
+		}else if (x[0]>=SnakeGame.SCREEN_WIDTH_X){
 			this.running = false;
 		}else if (y[0]<0) {
 			this.running = false;
-		}else if (y[0]>SnakeGame.SCREEN_HEIGHT_Y) {
+		}else if (y[0]>=SnakeGame.SCREEN_HEIGHT_Y) {
 			this.running = false;
+		}
+		
+		if (!running) {
+			this.timer.stop();
 		}
 	}
 	
