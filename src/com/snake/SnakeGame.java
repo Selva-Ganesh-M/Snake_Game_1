@@ -2,6 +2,7 @@ package com.snake;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -31,11 +32,50 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener {
 	Timer timer;
 	
 	public SnakeGame(){
-		setPreferredSize(new Dimension(SCREEN_HEIGHT_Y, SCREEN_WIDTH_X));
-		setBackground(Color.black);
-		setFocusable(true);
+		this.setPreferredSize(new Dimension(SCREEN_HEIGHT_Y, SCREEN_WIDTH_X));
+		this.setBackground(Color.black);
+		this.setFocusable(true);
 		this.addKeyListener(this);
+		this.startGame();
 	}
+	
+	public void startGame() {
+		this.running  = true;
+		this.timer = new Timer(SnakeGame.DELAY, this);
+		this.timer.start();
+	}
+	
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		this.draw(g);
+	}
+	
+	public void draw(Graphics g) {
+		for (int i=0; i<SnakeGame.SCREEN_WIDTH_X; i++) {
+			g.drawLine(i*SnakeGame.SIZE, 0, i*SnakeGame.SIZE, SnakeGame.SCREEN_HEIGHT_Y);			
+		}
+		for (int i=0; i<SnakeGame.SCREEN_HEIGHT_Y; i++) {
+			g.drawLine(0, i*SnakeGame.SIZE, SnakeGame.SCREEN_WIDTH_X, i*SnakeGame.SIZE);			
+		}
+		
+		g.setColor(Color.yellow);
+		g.fillOval(foodX, foodY, SIZE, SIZE);
+	}
+	
+	public void move() {
+		
+	}
+	
+	public void createFood() {
+		foodX = random.nextInt(((int)SCREEN_WIDTH_X/SIZE)*SIZE);
+		foodY = random.nextInt(((int)SCREEN_HEIGHT_Y/SIZE)*SIZE);		
+	}
+	
+	public void checkFood() {
+		
+	}
+	
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
